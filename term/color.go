@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-
 package term
 
 /*
@@ -34,6 +33,7 @@ available for comparisons and such.
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"strconv"
 )
@@ -265,9 +265,19 @@ func (c Green) String() string {
 	return colType(c)
 }
 
+// Greenf returns a Green formatted string.
+func Greenf(format string, a ...interface{}) string {
+	return colType(Green(fmt.Sprintf(format, a...)))
+}
+
 // String implements the Stringer interface for type Blue.
 func (c Blue) String() string {
 	return colType(c)
+}
+
+// Bluef returns a Blue formatted string.
+func Bluef(format string, a ...interface{}) string {
+	return colType(Blue(fmt.Sprintf(format, a...)))
 }
 
 // String implements the Stringer interface for type Red.
@@ -275,9 +285,19 @@ func (c Red) String() string {
 	return colType(c)
 }
 
+// Redf returns a Red formatted string.
+func Redf(format string, a ...interface{}) string {
+	return colType(Red(fmt.Sprintf(format, a...)))
+}
+
 // String implements the Stringer interface for type Yellow.
 func (c Yellow) String() string {
 	return colType(c)
+}
+
+// Yellowf returns a Yellow formatted string.
+func Yellowf(format string, a ...interface{}) string {
+	return colType(Yellow(fmt.Sprintf(format, a...)))
 }
 
 // String implements the Stringer interface for type Magenta.
@@ -285,9 +305,19 @@ func (c Magenta) String() string {
 	return colType(c)
 }
 
+// Magentaf returns a Magenta formatted string.
+func Magentaf(format string, a ...interface{}) string {
+	return colType(Magenta(fmt.Sprintf(format, a...)))
+}
+
 // String implements the Stringer interface for type White.
 func (c White) String() string {
 	return colType(c)
+}
+
+// Whitef returns a White formatted string.
+func Whitef(format string, a ...interface{}) string {
+	return colType(White(fmt.Sprintf(format, a...)))
 }
 
 // String implements the Stringer interface for type Black.
@@ -295,9 +325,19 @@ func (c Black) String() string {
 	return colType(c)
 }
 
+// Blackf returns a Black formatted string.
+func Blackf(format string, a ...interface{}) string {
+	return colType(Black(fmt.Sprintf(format, a...)))
+}
+
 // String implements the Stringer interface for type Cyan.
 func (c Cyan) String() string {
 	return colType(c)
+}
+
+// Cyanf returns a Cyan formatted string.
+func Cyanf(format string, a ...interface{}) string {
+	return colType(Cyan(fmt.Sprintf(format, a...)))
 }
 
 // Background
@@ -307,9 +347,19 @@ func (c BGreen) String() string {
 	return colType(c)
 }
 
+// BGreenf returns a BGreen formatted string.
+func BGreenf(format string, a ...interface{}) string {
+	return colType(BGreen(fmt.Sprintf(format, a...)))
+}
+
 // String implements the Stringer interface for type BBlue.
 func (c BBlue) String() string {
 	return colType(c)
+}
+
+// BBluef returns a BBlue formatted string.
+func BBluef(format string, a ...interface{}) string {
+	return colType(BBlue(fmt.Sprintf(format, a...)))
 }
 
 // String implements the Stringer interface for type BRed.
@@ -317,9 +367,19 @@ func (c BRed) String() string {
 	return colType(c)
 }
 
+// BRedf returns a BRed formatted string.
+func BRedf(format string, a ...interface{}) string {
+	return colType(BRed(fmt.Sprintf(format, a...)))
+}
+
 // String implements the Stringer interface for type BYellow.
 func (c BYellow) String() string {
 	return colType(c)
+}
+
+// BYellowf returns a BYellow formatted string.
+func BYellowf(format string, a ...interface{}) string {
+	return colType(BYellow(fmt.Sprintf(format, a...)))
 }
 
 // String implements the Stringer interface for type BMagenta.
@@ -327,9 +387,19 @@ func (c BMagenta) String() string {
 	return colType(c)
 }
 
+// BMagentaf returns a BMagenta formatted string.
+func BMagentaf(format string, a ...interface{}) string {
+	return colType(BMagenta(fmt.Sprintf(format, a...)))
+}
+
 // String implements the Stringer interface for type BWhite.
 func (c BWhite) String() string {
 	return colType(c)
+}
+
+// BWhitef returns a BWhite formatted string.
+func BWhitef(format string, a ...interface{}) string {
+	return colType(BWhite(fmt.Sprintf(format, a...)))
 }
 
 // String implements the Stringer interface for type BBlack.
@@ -337,9 +407,19 @@ func (c BBlack) String() string {
 	return colType(c)
 }
 
+// BBlackf returns a BBlack formatted string.
+func BBlackf(format string, a ...interface{}) string {
+	return colType(BBlack(fmt.Sprintf(format, a...)))
+}
+
 // String implements the Stringer interface for type BCyan.
 func (c BCyan) String() string {
 	return colType(c)
+}
+
+// BCyanf returns a BCyan formatted string.
+func BCyanf(format string, a ...interface{}) string {
+	return colType(BCyan(fmt.Sprintf(format, a...)))
 }
 
 // Modifier codes

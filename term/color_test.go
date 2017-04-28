@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-
 package term
 
 import (
@@ -42,17 +41,17 @@ func ExampleColor() {
 	}
 	fmt.Println("Defcon: ", col)
 	// Output:
-	// Hello [32mGreen world[39m
-	// [31mWarning![39m
-	// [5mGreen world[0m
-	// Defcon:  [31m2 FAST PACE[39m
+	// Hello [32mGreen world[39m
+	// [31mWarning![39m
+	// [5mGreen world[0m
+	// Defcon:  [31m2 FAST PACE[39m
 }
 
 // TestColorType tests the base color types.
 func TestColorType(t *testing.T) {
 	// Testing through all the simple Color types.
 	var res string
-	var colors = []testcol{
+	colors := []testcol{
 		{Green("Green"), FgGreen, "Green"},
 		{Blue("Blue"), FgBlue, "Blue"},
 		{Red("Red"), FgRed, "Red"},
@@ -94,6 +93,38 @@ func TestColorType(t *testing.T) {
 		}
 	}
 	t.Log(res)
+}
+
+// TestColorFmt tests out the fmt printers.
+func TestColorFmt(t *testing.T) {
+	nr := 37
+	array := []string{"opel", "ascona"}
+	colors := []testcol{
+		{Green(fmt.Sprintf("Green nr: %d Array: %v", nr, array)), Greenf("Green nr: %d Array: %v", nr, array), ""},
+		{Blue(fmt.Sprintf("Blue nr: %d Array: %v", nr, array)), Bluef("Blue nr: %d Array: %v", nr, array), ""},
+		{Red(fmt.Sprintf("Red nr: %d Array: %v", nr, array)), Redf("Red nr: %d Array: %v", nr, array), ""},
+		{Yellow(fmt.Sprintf("Yellow nr: %d Array: %v", nr, array)), Yellowf("Yellow nr: %d Array: %v", nr, array), ""},
+		{Magenta(fmt.Sprintf("Magenta nr: %d Array: %v", nr, array)), Magentaf("Magenta nr: %d Array: %v", nr, array), ""},
+		{Cyan(fmt.Sprintf("Cyan nr: %d Array: %v", nr, array)), Cyanf("Cyan nr: %d Array: %v", nr, array), ""},
+		{White(fmt.Sprintf("White nr: %d Array: %v", nr, array)), Whitef("White nr: %d Array: %v", nr, array), ""},
+		{Black(fmt.Sprintf("Black nr: %d Array: %v", nr, array)), Blackf("Black nr: %d Array: %v", nr, array), ""},
+		// Background
+		{BGreen(fmt.Sprintf("BGreen nr: %d Array: %v", nr, array)), BGreenf("BGreen nr: %d Array: %v", nr, array), ""},
+		{BBlue(fmt.Sprintf("BBlue nr: %d Array: %v", nr, array)), BBluef("BBlue nr: %d Array: %v", nr, array), ""},
+		{BRed(fmt.Sprintf("BRed nr: %d Array: %v", nr, array)), BRedf("BRed nr: %d Array: %v", nr, array), ""},
+		{BYellow(fmt.Sprintf("BYellow nr: %d Array: %v", nr, array)), BYellowf("BYellow nr: %d Array: %v", nr, array), ""},
+		{BMagenta(fmt.Sprintf("BMagenta nr: %d Array: %v", nr, array)), BMagentaf("BMagenta nr: %d Array: %v", nr, array), ""},
+		{BCyan(fmt.Sprintf("BCyan nr: %d Array: %v", nr, array)), BCyanf("BCyan nr: %d Array: %v", nr, array), ""},
+		{BWhite(fmt.Sprintf("BWhite nr: %d Array: %v", nr, array)), BWhitef("BWhite nr: %d Array: %v", nr, array), ""},
+		{BBlack(fmt.Sprintf("BBlack nr: %d Array: %v", nr, array)), BBlackf("BBlack nr: %d Array: %v", nr, array), ""}}
+
+	for _, col := range colors {
+		if got, want := col.str.String(), col.exp; got != want {
+			t.Errorf("got: %v want: %v", got, want)
+			continue
+		}
+		t.Log(col.exp)
+	}
 }
 
 // TestModType tests out the attributes.
