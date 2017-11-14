@@ -41,10 +41,10 @@ func ExampleColor() {
 	}
 	fmt.Println("Defcon: ", col)
 	// Output:
-	// Hello [32mGreen world[39m
-	// [31mWarning![39m
-	// [5mGreen world[0m
-	// Defcon:  [31m2 FAST PACE[39m
+	// Hello [32mGreen world[39m
+	// [31mWarning![39m
+	// [5mGreen world[0m
+	// Defcon:  [31m2 FAST PACE[39m
 }
 
 // TestColorType tests the base color types.
