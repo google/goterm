@@ -2,13 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-
 package term
 
 import "testing"
 
-// TestSSH tests the Termios<>SSH term attribute conversions.
-func TestSSH(t *testing.T) {
+// TestSSHLinux tests the Termios<>SSH term attribute conversions.
+func TestSSHLinux(t *testing.T) {
 	pty, err := OpenPTY()
 	if err != nil {
 		t.Fatalf("OpenPTY failed: %v", err)
