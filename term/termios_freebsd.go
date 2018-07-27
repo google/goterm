@@ -123,17 +123,22 @@ func (t *Termios) Setwinsz(file *os.File) error {
 	return nil
 }
 
+type dname struct {
+	len int
+	buf *[]byte
+}
+
 // OpenPTY Creates a new Master/Slave PTY pair.
 func OpenPTY() (*PTY, error) {
 	fd, _, errno := syscall.Syscall(OPENPT, uintptr(os.O_RDWR|syscall.O_NOCTTY), uintptr(0), uintptr(0))
 	if errno != 0 {
 		return nil, errno
 	}
-	// unlock pty slave
-	var unlock int // 0 => Unlock
-	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(TIOCSPTLCK), uintptr(unsafe.Pointer(&unlock))); errno != 0 {
+	var dn dname
+	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(120), uintptr(unsafe.Pointer(&dn))); errno != 0 {
 		return nil, errno
 	}
+
 	fmt.Println(Blue("Wow.. This worked!, fd:"), fd)
 
 	return nil, nil
