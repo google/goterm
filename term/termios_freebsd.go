@@ -130,7 +130,8 @@ const (
 
 // OpenPTY Creates a new Master/Slave PTY pair.
 func OpenPTY() (*PTY, error) {
-	if _, _, errno := syscall.Syscall(502, uintptr(os.O_RDWR|syscall.O_NOCTTY), uintptr(0), uintptr(0)); errno != 0 {
+	var nothing int
+	if _, _, errno := syscall.Syscall(504, uintptr(os.O_RDWR|syscall.O_NOCTTY), uintptr(nothing), uintptr(nothing)); errno != 0 {
 		return nil, errno
 	}
 	fmt.Println(Blue("Wow.. This worked!"))
