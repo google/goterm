@@ -20,6 +20,8 @@ const (
 	TIOCSPTLCK = 0x40045431 // TIOCSPTLCK IOCT used to lock/unlock PTY
 	CBAUD      = 0010017    // CBAUD Serial speed settings
 	CBAUDEX    = 0010000    // CBAUDX Serial speed settings
+	// FreeBSD posix_openpt syscall.
+	OPENPT = 504
 )
 
 // Set Sets terminal t attributes on file.
@@ -121,20 +123,18 @@ func (t *Termios) Setwinsz(file *os.File) error {
 	return nil
 }
 
-const (
-	major         = "lmnopqrsLMNOPQRS"
-	minor         = "01234567890abcdefghijklmnopqrstuv"
-	ptyMasterBase = "/dev/pty"
-	ptySlaveBase  = "/dev/tty"
-)
-
 // OpenPTY Creates a new Master/Slave PTY pair.
 func OpenPTY() (*PTY, error) {
-	var nothing int
-	if _, _, errno := syscall.Syscall(504, uintptr(os.O_RDWR|syscall.O_NOCTTY), uintptr(nothing), uintptr(nothing)); errno != 0 {
+	fd, _, errno := syscall.Syscall(OPENPT, uintptr(os.O_RDWR|syscall.O_NOCTTY), uintptr(0), uintptr(0))
+	if errno != 0 {
 		return nil, errno
 	}
-	fmt.Println(Blue("Wow.. This worked!"))
+	// unlock pty slave
+	var unlock int // 0 => Unlock
+	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(TIOCSPTLCK), uintptr(unsafe.Pointer(&unlock))); errno != 0 {
+		return nil, errno
+	}
+	fmt.Println(Blue("Wow.. This worked!, fd:"), fd)
 
 	return nil, nil
 }
