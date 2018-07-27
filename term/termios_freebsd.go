@@ -2,14 +2,12 @@ package term
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 	"syscall"
 	"unsafe"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // IOCTL terminal stuff.
@@ -132,9 +130,12 @@ const (
 
 // OpenPTY Creates a new Master/Slave PTY pair.
 func OpenPTY() (*PTY, error) {
-	_, _, errno := syscall.Syscall(502, uintptr())
+	if _, _, errno := syscall.Syscall(502, uintptr(os.O_RDWR|syscall.O_NOCTTY), uintptr(0), uintptr(0)); errno != 0 {
+		return nil, errno
+	}
+	fmt.Println(Blue("Wow.. This worked!"))
 
-	return nil, status.Errorf(codes.NotFound, "No Master TTY found")
+	return nil, nil
 }
 
 // Close closes the PTYs that OpenPTY created.
