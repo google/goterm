@@ -2,12 +2,14 @@ package term
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
 	"syscall"
 	"unsafe"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // IOCTL terminal stuff.
@@ -122,48 +124,17 @@ func (t *Termios) Setwinsz(file *os.File) error {
 }
 
 const (
-	major   = "lmnopqrsLMNOPQRS"
-	minor   = "01234567890abcdefghijklmnopqrstuv"
-	ptyBase = "/dev/pty"
+	major         = "lmnopqrsLMNOPQRS"
+	minor         = "01234567890abcdefghijklmnopqrstuv"
+	ptyMasterBase = "/dev/pty"
+	ptySlaveBase  = "/dev/tty"
 )
 
 // OpenPTY Creates a new Master/Slave PTY pair.
 func OpenPTY() (*PTY, error) {
-	numMinors := len(minor)
-	numPTYs := len(major) * numMinors
+	_, _, errno := syscall.Syscall(502, uintptr())
 
-	for i := 0; i < numPTYs; i++ {
-		fmt.Printf("i: %s%c%c\n", ptyBase, major[i/numMinors], minor[i%numMinors])
-	}
-	// Opening ptmx gives you the FD of a brand new PTY
-	master, err := os.OpenFile("/dev/ptmx", os.O_RDWR, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	// unlock pty slave
-	var unlock int // 0 => Unlock
-	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(master.Fd()), uintptr(TIOCSPTLCK), uintptr(unsafe.Pointer(&unlock))); errno != 0 {
-		master.Close()
-		return nil, errno
-	}
-
-	// get path of pts slave
-	pty := &PTY{Master: master}
-	slaveStr, err := pty.PTSName()
-	if err != nil {
-		master.Close()
-		return nil, err
-	}
-
-	// open pty slave
-	pty.Slave, err = os.OpenFile(slaveStr, os.O_RDWR|syscall.O_NOCTTY, 0)
-	if err != nil {
-		master.Close()
-		return nil, err
-	}
-
-	return pty, nil
+	return nil, status.Errorf(codes.NotFound, "No Master TTY found")
 }
 
 // Close closes the PTYs that OpenPTY created.
