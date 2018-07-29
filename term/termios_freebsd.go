@@ -125,8 +125,12 @@ func (t *Termios) Setwinsz(file *os.File) error {
 
 type dname struct {
 	len int
-	buf *[]byte
+	buf [512]byte
 }
+
+const (
+	pathDev = "/dev/"
+)
 
 // OpenPTY Creates a new Master/Slave PTY pair.
 func OpenPTY() (*PTY, error) {
