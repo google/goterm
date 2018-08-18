@@ -138,8 +138,19 @@ func OpenPTY() (*PTY, error) {
 	if errno != 0 {
 		return nil, errno
 	}
+
 	var dn dname
-	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(120), uintptr(unsafe.Pointer(&dn))); errno != 0 {
+	for i, c := range pathDev {
+		dn.buf[i] = byte(c)
+	}
+	dn.len = len(pathDev)
+	// Might be interesting.
+	// https://github.com/freebsd/freebsd/blob/c033b5978ec7662ff39840a19092334755c381df/sys/sys/ioccom.h
+	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), uintptr(0x2000741c), uintptr(0)); errno != 0 {
+		return nil, errno
+	}
+	fmt.Println(Blue("Was here"))
+	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(0), uintptr(120), uintptr(unsafe.Pointer(&dn))); errno != 0 {
 		return nil, errno
 	}
 
