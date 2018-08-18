@@ -150,7 +150,7 @@ func OpenPTY() (*PTY, error) {
 		return nil, errno
 	}
 	fmt.Println(Blue("Was here"))
-	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(0), uintptr(120), uintptr(unsafe.Pointer(&dn))); errno != 0 {
+	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(0), uintptr(0x80106678), uintptr(unsafe.Pointer(&dn))); errno != 0 {
 		return nil, errno
 	}
 
