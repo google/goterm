@@ -1,6 +1,7 @@
 package term
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -125,7 +126,7 @@ func (t *Termios) Setwinsz(file *os.File) error {
 
 type dname struct {
 	len int
-	buf [512]byte
+	buf unsafe.Pointer
 }
 
 const (
@@ -139,10 +140,12 @@ func OpenPTY() (*PTY, error) {
 		return nil, errno
 	}
 
+	buf := bytes.NewBufferString(pathDev)
+	buf.Grow(512)
+
+	data := buf.Bytes()
 	var dn dname
-	for i, c := range pathDev {
-		dn.buf[i] = byte(c)
-	}
+	dn.buf = unsafe.Pointer(&data[0])
 	dn.len = len(pathDev)
 	// Might be interesting.
 	// https://github.com/freebsd/freebsd/blob/c033b5978ec7662ff39840a19092334755c381df/sys/sys/ioccom.h
