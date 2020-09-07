@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+
 /*
 Package term implements a subset of the C termios library to interface with Terminals.
 
@@ -22,7 +23,6 @@ package term
 import (
 	"errors"
 	"os"
-	"runtime"
 	"strconv"
 	"strings"
 	"syscall"
@@ -126,21 +126,6 @@ const (
 	VEOL2    = 16 // VEOL2 		char alternate to end line
 	tNCCS    = 32 // tNCCS    Termios CC size
 )
-
-const (
-	_IOC_VOID    uintptr = 0x20000000
-	_IOC_OUT     uintptr = 0x40000000
-	_IOC_IN      uintptr = 0x80000000
-	_IOC_IN_OUT  uintptr = _IOC_OUT | _IOC_IN
-	_IOC_DIRMASK         = _IOC_VOID | _IOC_OUT | _IOC_IN
-
-	_IOC_PARAM_SHIFT = 13
-	_IOC_PARAM_MASK  = (1 << _IOC_PARAM_SHIFT) - 1
-)
-
-func _IOC_PARM_LEN(ioctl uintptr) uintptr {
-	return (ioctl >> 16) & _IOC_PARAM_MASK
-}
 
 // Termios merge of the C Terminal and Kernel termios structs.
 type Termios struct {
@@ -290,31 +275,6 @@ func GetChar(f *os.File) (b byte, err error) {
 
 // PTSName return the name of the pty.
 func (p *PTY) PTSName() (string, error) {
-	switch runtime.GOOS {
-	case "darwin":
-		return p.darwin_PTSName()
-	default:
-		return p.linux_PTSName()
-	}
-}
-
-func (p *PTY) darwin_PTSName() (string, error) {
-	n := make([]byte, _IOC_PARM_LEN(syscall.TIOCPTYGNAME))
-
-	_, _, err := syscall.Syscall(syscall.SYS_IOCTL, p.Master.Fd(), syscall.TIOCPTYGNAME, uintptr(unsafe.Pointer(&n[0])))
-	if err != 0 {
-		return "", err
-	}
-
-	for i, c := range n {
-		if c == 0 {
-			return string(n[:i]), nil
-		}
-	}
-	return "", errors.New("TIOCPTYGNAME string not NUL-terminated")	
-}
-
-func (p *PTY) linux_PTSName() (string, error) {
 	n, err := p.PTSNumber()
 	if err != nil {
 		return "", err
@@ -365,56 +325,6 @@ func (t *Termios) Setwinsz(file *os.File) error {
 
 // OpenPTY Creates a new Master/Slave PTY pair.
 func OpenPTY() (*PTY, error) {
-	switch runtime.GOOS {
-	case "darwin":
-		return darwin_openPTY()
-	case "windows":
-		return nil, errors.New("not supported")
-	default:
-		return linux_openPTY()
-	}
-}
-
-func darwin_openPTY() (*PTY, error) {
-	// Opening ptmx gives you the FD of a brand new PTY
-	pFD, err := syscall.Open("/dev/ptmx", syscall.O_RDWR | syscall.O_CLOEXEC , 0)
-	if err != nil {
-		return nil, err
-	}
-
-	master := os.NewFile(uintptr(pFD), "/dev/ptmx")
-
-	// unlock pty slave
-	var unlock int // 0 => Unlock
-	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(master.Fd()), uintptr(syscall.TIOCPTYUNLK), uintptr(unsafe.Pointer(&unlock))); errno != 0 {
-		master.Close()
-		return nil, errno
-	}
-
-	if _, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(master.Fd()), syscall.TIOCPTYGRANT, 0); errno != 0 {
-		master.Close()
-		return nil, errno
-	}
-	
-	// get path of pts slave
-	pty := &PTY{Master: master}
-	slaveStr, err := pty.PTSName()
-	if err != nil {
-		master.Close()
-		return nil, err
-	}
-
-	// open pty slave
-	pty.Slave, err = os.OpenFile(slaveStr, os.O_RDWR|syscall.O_NOCTTY, 0)
-	if err != nil {
-		master.Close()
-		return nil, err
-	}
-
-	return pty, nil
-}
-
-func linux_openPTY() (*PTY, error) {
 	// Opening ptmx gives you the FD of a brand new PTY
 	master, err := os.OpenFile("/dev/ptmx", os.O_RDWR, 0)
 	if err != nil {
